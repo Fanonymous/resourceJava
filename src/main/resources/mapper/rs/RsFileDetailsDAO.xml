@@ -1,0 +1,1187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nugget.modules.rs.dao.RsFileDetailsDAO">
+  <resultMap id="BaseResultMap" type="com.nugget.modules.rs.entity.RsFileDetailsEntity">
+    <id column="resources_id" jdbcType="BIGINT" property="resourcesId" />
+    <result column="title" jdbcType="VARCHAR" property="title" />
+    <result column="introduction" jdbcType="VARCHAR" property="introduction" />
+    <result column="size" jdbcType="BIGINT" property="size" />
+    <result column="upload_time" jdbcType="TIMESTAMP" property="uploadTime" />
+    <result column="upload_by" jdbcType="BIGINT" property="uploadBy" />
+      <result column="author" jdbcType="VARCHAR" property="author" />
+    <result column="view_count" jdbcType="INTEGER" property="viewCount" />
+    <result column="download_count" jdbcType="INTEGER" property="downloadCount" />
+    <result column="is_preferred" jdbcType="TINYINT" property="isPreferred" />
+    <result column="come_from" jdbcType="INTEGER" property="comeFrom" />
+    <result column="search_filed" jdbcType="VARCHAR" property="searchFiled" />
+    <result column="resources_address" jdbcType="VARCHAR" property="resourcesAddress" />
+    <result column="thumb_address" jdbcType="VARCHAR" property="thumbAddress" />
+    <result column="header_image_address" jdbcType="VARCHAR" property="headerImageAddress" />
+    <result column="tags" jdbcType="VARCHAR" property="tags" />
+    <result column="channel_id" jdbcType="INTEGER" property="channelId" />
+    <result column="collection_count" jdbcType="INTEGER" property="collectionCount" />
+    <result column="resources_type" jdbcType="INTEGER" property="resourcesType" />
+    <result column="subscribe_count" jdbcType="INTEGER" property="subscribeCount" />
+    <result column="share_count" jdbcType="INTEGER" property="shareCount" />
+    <result column="enabled" jdbcType="TINYINT" property="enabled" />
+    <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="create_by" jdbcType="BIGINT" property="createBy" />
+    <result column="update_date" jdbcType="TIMESTAMP" property="updateDate" />
+    <result column="update_by" jdbcType="BIGINT" property="updateBy" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    resources_id, title, introduction, `size`, upload_time, upload_by,author, view_count, download_count,
+    is_preferred, come_from, search_filed, resources_address, thumb_address, header_image_address,
+    tags, channel_id, collection_count, (select dict_name from rs_dict where `type` ='resources_type' and `value`=resources_type) as resources_type, subscribe_count, share_count, enabled, create_date,
+    create_by, update_date, update_by
+  </sql>
+  <sql id="where">
+    <where>
+      <if test="resourcesId != null">
+        and resources_id = #{resourcesId}
+      </if>
+      <if test="enabled != null">
+        and enabled = #{enabled}
+      </if>
+      <if test="tagIds != null">
+        and find_in_set(#{tagIds},tags)
+      </if>
+    </where>
+  </sql>
+  <select id="queryList" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List"/>
+    from rs_file_details
+    <include refid="where"/>
+    <if test="offset != null and limit != null">
+      limit #{offset}, #{limit}
+    </if>
+  </select>
+
+  <select id="queryTotal" resultType="int">
+    select count(*) from rs_file_details
+    <include refid="where"/>
+  </select>
+
+  <select id="getInfo" resultType="java.util.Map">
+    select
+        a.resources_id as resourcesId,
+        title,
+        introduction,
+        case
+        when  `size`>1024 and `size` &lt;= 1048576 then concat(FORMAT(`size`/1024,2),"MB")
+        when  `size`>1048576 then concat(FORMAT(`size`/1048576,2),"GB")
+        else concat(`size`,"KB") end  as `size`,
+        upload_time as uploadTime,
+        upload_by as uploadBy,
+        view_count as viewCount,
+        download_count as downloadCount,
+        is_preferred as isPreferred,
+        resources_address as resourcesAddress,
+        thumb_address as thumbAddress,
+        header_image_address as headerImageAddress,
+        tags,
+        collection_count as collectionCount,
+        (select dict_name from rs_dict where `type` ='resources_type' and `value`=resources_type) as resourcesType,
+        ifnull(b.is_collected,0) as isCollected
+    from
+        rs_file_details a
+        left join
+        (select is_collected, resources_id from rs_user_resources where rs_user_id = #{rsUserId}) b
+        on a.resources_id = b.resources_id
+    where
+        a.resources_id = #{resourcesId}
+
+  </select>
+
+
+  <select id="queryByResourcesId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from rs_file_details
+    where resources_id = #{resourcesId,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from rs_file_details
+    where resources_id = #{resourcesId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" keyColumn="resources_id" keyProperty="resourcesId" parameterType="com.nugget.modules.rs.entity.RsFileDetailsEntity" useGeneratedKeys="true">
+    insert into rs_file_details (title, introduction, `size`,
+      upload_time, upload_by, view_count,
+      download_count, is_preferred, come_from,
+      search_filed, resources_address, thumb_address,
+      header_image_address, tags, collection_count,
+      resources_type, subscribe_count, share_count,
+      enabled, create_date, create_by,
+      update_date, update_by)
+    values (#{title,jdbcType=VARCHAR}, #{introduction,jdbcType=VARCHAR}, #{size,jdbcType=BIGINT},
+      #{uploadTime,jdbcType=TIMESTAMP}, #{uploadBy,jdbcType=BIGINT}, #{viewCount,jdbcType=INTEGER},
+      #{downloadCount,jdbcType=INTEGER}, #{isPreferred,jdbcType=TINYINT}, #{comeFrom,jdbcType=INTEGER},
+      #{searchFiled,jdbcType=VARCHAR}, #{resourcesAddress,jdbcType=VARCHAR}, #{thumbAddress,jdbcType=VARCHAR},
+      #{headerImageAddress,jdbcType=VARCHAR}, #{tags,jdbcType=VARCHAR}, #{collectionCount,jdbcType=INTEGER},
+      #{resourcesType,jdbcType=INTEGER}, #{subscribeCount,jdbcType=INTEGER}, #{shareCount,jdbcType=INTEGER},
+      #{enabled,jdbcType=TINYINT}, #{createDate,jdbcType=TIMESTAMP}, #{createBy,jdbcType=BIGINT},
+      #{updateDate,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=BIGINT})
+  </insert>
+  <insert id="insertSelective" keyColumn="resources_id" keyProperty="resourcesId" parameterType="com.nugget.modules.rs.entity.RsFileDetailsEntity" useGeneratedKeys="true">
+    insert into rs_file_details
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="title != null">
+        title,
+      </if>
+      <if test="introduction != null">
+        introduction,
+      </if>
+      <if test="size != null">
+        `size`,
+      </if>
+      <if test="uploadTime != null">
+        upload_time,
+      </if>
+      <if test="uploadBy != null">
+        upload_by,
+      </if>
+      <if test="viewCount != null">
+        view_count,
+      </if>
+      <if test="downloadCount != null">
+        download_count,
+      </if>
+      <if test="isPreferred != null">
+        is_preferred,
+      </if>
+      <if test="comeFrom != null">
+        come_from,
+      </if>
+      <if test="searchFiled != null">
+        search_filed,
+      </if>
+      <if test="resourcesAddress != null">
+        resources_address,
+      </if>
+      <if test="thumbAddress != null">
+        thumb_address,
+      </if>
+      <if test="headerImageAddress != null">
+        header_image_address,
+      </if>
+      <if test="tags != null">
+        tags,
+      </if>
+      <if test="collectionCount != null">
+        collection_count,
+      </if>
+      <if test="resourcesType != null">
+        resources_type,
+      </if>
+      <if test="subscribeCount != null">
+        subscribe_count,
+      </if>
+      <if test="shareCount != null">
+        share_count,
+      </if>
+      <if test="enabled != null">
+        enabled,
+      </if>
+      <if test="createDate != null">
+        create_date,
+      </if>
+      <if test="createBy != null">
+        create_by,
+      </if>
+      <if test="updateDate != null">
+        update_date,
+      </if>
+      <if test="updateBy != null">
+        update_by,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="title != null">
+        #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="introduction != null">
+        #{introduction,jdbcType=VARCHAR},
+      </if>
+      <if test="size != null">
+        #{size,jdbcType=BIGINT},
+      </if>
+      <if test="uploadTime != null">
+        #{uploadTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="uploadBy != null">
+        #{uploadBy,jdbcType=BIGINT},
+      </if>
+      <if test="viewCount != null">
+        #{viewCount,jdbcType=INTEGER},
+      </if>
+      <if test="downloadCount != null">
+        #{downloadCount,jdbcType=INTEGER},
+      </if>
+      <if test="isPreferred != null">
+        #{isPreferred,jdbcType=TINYINT},
+      </if>
+      <if test="comeFrom != null">
+        #{comeFrom,jdbcType=INTEGER},
+      </if>
+      <if test="searchFiled != null">
+        #{searchFiled,jdbcType=VARCHAR},
+      </if>
+      <if test="resourcesAddress != null">
+        #{resourcesAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="thumbAddress != null">
+        #{thumbAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="headerImageAddress != null">
+        #{headerImageAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="tags != null">
+        #{tags,jdbcType=VARCHAR},
+      </if>
+      <if test="collectionCount != null">
+        #{collectionCount,jdbcType=INTEGER},
+      </if>
+      <if test="resourcesType != null">
+        #{resourcesType,jdbcType=INTEGER},
+      </if>
+      <if test="subscribeCount != null">
+        #{subscribeCount,jdbcType=INTEGER},
+      </if>
+      <if test="shareCount != null">
+        #{shareCount,jdbcType=INTEGER},
+      </if>
+      <if test="enabled != null">
+        #{enabled,jdbcType=TINYINT},
+      </if>
+      <if test="createDate != null">
+        #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createBy != null">
+        #{createBy,jdbcType=BIGINT},
+      </if>
+      <if test="updateDate != null">
+        #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateBy != null">
+        #{updateBy,jdbcType=BIGINT},
+      </if>
+    </trim>
+  </insert>
+  <update id="update" parameterType="com.nugget.modules.rs.entity.RsFileDetailsEntity">
+    update rs_file_details
+    <set>
+      <if test="title != null">
+        title = #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="introduction != null">
+        introduction = #{introduction,jdbcType=VARCHAR},
+      </if>
+      <if test="size != null">
+        `size` = #{size,jdbcType=BIGINT},
+      </if>
+      <if test="uploadTime != null">
+        upload_time = #{uploadTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="uploadBy != null">
+        upload_by = #{uploadBy,jdbcType=BIGINT},
+      </if>
+      <if test="viewCount != null">
+        view_count = #{viewCount,jdbcType=INTEGER},
+      </if>
+      <if test="downloadCount != null">
+        download_count = #{downloadCount,jdbcType=INTEGER},
+      </if>
+      <if test="isPreferred != null">
+        is_preferred = #{isPreferred,jdbcType=TINYINT},
+      </if>
+      <if test="comeFrom != null">
+        come_from = #{comeFrom,jdbcType=INTEGER},
+      </if>
+      <if test="searchFiled != null">
+        search_filed = #{searchFiled,jdbcType=VARCHAR},
+      </if>
+      <if test="resourcesAddress != null">
+        resources_address = #{resourcesAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="thumbAddress != null">
+        thumb_address = #{thumbAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="headerImageAddress != null">
+        header_image_address = #{headerImageAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="tags != null">
+        tags = #{tags,jdbcType=VARCHAR},
+      </if>
+      <if test="collectionCount != null">
+        collection_count = #{collectionCount,jdbcType=INTEGER},
+      </if>
+      <if test="resourcesType != null">
+        resources_type = #{resourcesType,jdbcType=INTEGER},
+      </if>
+      <if test="subscribeCount != null">
+        subscribe_count = #{subscribeCount,jdbcType=INTEGER},
+      </if>
+      <if test="shareCount != null">
+        share_count = #{shareCount,jdbcType=INTEGER},
+      </if>
+      <if test="enabled != null">
+        enabled = #{enabled,jdbcType=TINYINT},
+      </if>
+      <if test="createDate != null">
+        create_date = #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createBy != null">
+        create_by = #{createBy,jdbcType=BIGINT},
+      </if>
+      <if test="updateDate != null">
+        update_date = #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateBy != null">
+        update_by = #{updateBy,jdbcType=BIGINT},
+      </if>
+    </set>
+    where resources_id = #{resourcesId,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.nugget.modules.rs.entity.RsFileDetailsEntity">
+    update rs_file_details
+    set title = #{title,jdbcType=VARCHAR},
+      introduction = #{introduction,jdbcType=VARCHAR},
+      `size` = #{size,jdbcType=BIGINT},
+      upload_time = #{uploadTime,jdbcType=TIMESTAMP},
+      upload_by = #{uploadBy,jdbcType=BIGINT},
+      view_count = #{viewCount,jdbcType=INTEGER},
+      download_count = #{downloadCount,jdbcType=INTEGER},
+      is_preferred = #{isPreferred,jdbcType=TINYINT},
+      come_from = #{comeFrom,jdbcType=INTEGER},
+      search_filed = #{searchFiled,jdbcType=VARCHAR},
+      resources_address = #{resourcesAddress,jdbcType=VARCHAR},
+      thumb_address = #{thumbAddress,jdbcType=VARCHAR},
+      header_image_address = #{headerImageAddress,jdbcType=VARCHAR},
+      tags = #{tags,jdbcType=VARCHAR},
+      collection_count = #{collectionCount,jdbcType=INTEGER},
+      resources_type = #{resourcesType,jdbcType=INTEGER},
+      subscribe_count = #{subscribeCount,jdbcType=INTEGER},
+      share_count = #{shareCount,jdbcType=INTEGER},
+      enabled = #{enabled,jdbcType=TINYINT},
+      create_date = #{createDate,jdbcType=TIMESTAMP},
+      create_by = #{createBy,jdbcType=BIGINT},
+      update_date = #{updateDate,jdbcType=TIMESTAMP},
+      update_by = #{updateBy,jdbcType=BIGINT}
+    where resources_id = #{resourcesId,jdbcType=BIGINT}
+  </update>
+
+  <update id="updatePreferred" parameterType="java.util.List">
+    update rs_file_details set is_preferred = 1,update_date = now()
+    where resources_id in
+    <foreach collection="list" item="item" index="index" open="(" separator="," close=")">
+      #{item.resourcesId,jdbcType=BIGINT}
+    </foreach>
+  </update>
+    <update id="resetPreferred">
+        update rs_file_details set is_preferred = 0,update_date = now()
+        where is_preferred = 1
+    </update>
+
+  <select id="getHotList" parameterType="java.util.Map" resultType="java.util.Map">
+      SELECT
+          resources_id AS resourcesId,
+          title,
+          thumb_address AS thumbAddress,
+          tags
+      FROM
+          rs_file_details
+      WHERE
+          enabled = 0 and title is not null and LENGTH(title) !=0
+          AND DATE_SUB( CURDATE( ), INTERVAL 3 DAY ) &lt;= date( update_date )
+          <if test="channelId != null ">AND channel_id = #{channelId}</if>
+          <if test="isPreferred != null">AND is_preferred = #{isPreferred}</if>
+          <if test="isPreferred == null">
+            ORDER BY
+                view_count DESC
+            LIMIT 5
+          </if>
+          <if test="isPreferred != null">
+            ORDER BY update_date desc
+            <if test="offset != null and limit != null">
+                limit #{offset}, #{limit}
+            </if>
+
+      </if>
+  </select>
+
+    <select id="getPreferred" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT
+            resources_id AS resourcesId,
+            title,
+            thumb_address AS thumbAddress
+        FROM
+            `rs_file_details` AS t1
+        WHERE
+            enabled = 0 and title is not null and LENGTH(title) !=0
+            <if test="channelId != null ">AND channel_id = #{channelId}</if>
+            <if test="isPreferred != null">AND is_preferred = #{isPreferred}</if>
+        ORDER BY
+            RAND(),
+            update_date DESC
+            LIMIT 5;
+    </select>
+
+
+  <select id="getRecommendList" resultType="java.util.Map" parameterType="java.util.Map">
+      SELECT
+          fd.resources_id as resourcesId,
+          fd.title,
+          fd.view_count as viewCount,
+          fd.thumb_address as thumbAddress,
+          fd.is_preferred as isPreferred,
+          fd.tags as tagsName,
+          (SELECT is_collected FROM rs_user_resources WHERE rs_user_id = #{rsUserId} and resources_id = fd.resources_id ) as isCollected,
+          (select channel_name from rs_channel where channel_id = fd.channel_id) as channelName
+      FROM
+          (select
+              resources_id,
+              title,
+              view_count,
+              thumb_address,
+              is_preferred,
+              tags,
+              channel_id,
+              enabled,
+              update_date
+          from
+              rs_file_details
+          where
+                enabled = 0 and title is not null and LENGTH(title) !=0
+                <if test="channelId != null">and channel_id = #{channelId}</if>
+                <if test="tagId != null">and FIND_IN_SET( #{tagId}, tags )</if>
+                <if test="notTagList != null">
+                    and
+                    <foreach collection="notTagList" index="index" item="item" open="(" separator="and" close=")">
+                    !FIND_IN_SET( #{item}, tags )
+                    </foreach>
+                </if>
+          ) fd
+            order by
+            <if test="subList != null">
+                if(
+                      <foreach collection="subList" index="index" item="item" open="(" separator="or" close=")">
+                          FIND_IN_SET( #{item}, fd.tags )
+                      </foreach>
+                ,0,1) asc ,
+            </if>
+                fd.update_date desc
+            <if test="offset != null and limit != null">
+              limit #{offset}, #{limit}
+            </if>
+  </select>
+
+    <select id="getRecommendTotal" resultType="java.lang.Integer" parameterType="java.util.Map">
+        SELECT
+            count(fd.resources_id)
+        FROM
+        (select
+            *
+        from
+            rs_file_details
+            where
+            enabled = 0 and title is not null and LENGTH(title) !=0
+            <if test="channelId != null">and channel_id = #{channelId}</if>
+            <if test="notTagList != null">
+                and
+                <foreach collection="notTagList" index="index" item="item" open="(" separator="and" close=")">
+                    !FIND_IN_SET( #{item}, tags )
+                </foreach>
+            </if>
+            <if test="tagId != null">and FIND_IN_SET( #{tagId}, tags )</if>
+        ) fd
+    </select>
+
+  <select id="getRecommendList1" parameterType="java.util.Map" resultType="java.util.Map">
+      SELECT
+          fd.resources_id as resourcesId,
+          fd.title,
+          fd.view_count as viewCount,
+          fd.thumb_address as thumbAddress,
+          fd.is_preferred as isPreferred,
+          (SELECT is_collected FROM rs_user_resources WHERE rs_user_id = #{rsUserId} and resources_id = fd.resources_id ) as isCollected,
+          fd.tags as tagsName,
+          (select channel_name from rs_channel where channel_id = fd.channel_id) as channelName
+      FROM
+      (select
+          resources_id,
+          title,
+          view_count,
+          thumb_address,
+          is_preferred,
+          tags,
+          channel_id,
+          enabled,
+      update_date
+      from
+          rs_file_details
+          where
+            enabled = 0 and title is not null and LENGTH(title) !=0
+            <if test="channelId!=null">and channel_id = #{channelId}</if>
+            <if test="tagId != null">and FIND_IN_SET( #{tagId}, tags )</if>
+          <if test="notTagList != null">
+              and
+              <foreach collection="notTagList" index="index" item="item" open="(" separator="and" close=")">
+                  !FIND_IN_SET( #{item}, tags )
+              </foreach>
+          </if>
+      ) fd
+          order by
+          <if test="tagList != null">
+                if(
+                <foreach collection="tagList" index="index" item="item" open="(" separator="or" close=")">
+                          FIND_IN_SET( #{item}, fd.tags )
+                      </foreach>
+                ,0,1) asc ,
+          </if>
+            fd.update_date desc
+      <if test="offset != null and limit != null">
+          limit #{offset}, #{limit}
+      </if>
+  </select>
+
+    <select id="getRecommendTotal1" parameterType="java.util.Map" resultType="java.lang.Integer">
+        SELECT
+            count(fd.resources_id)
+        FROM
+        (select
+            *
+        from
+            rs_file_details
+            where
+                enabled = 0 and and title is not null and LENGTH(title) !=0
+            <if test="tagId != null">and FIND_IN_SET( #{tagId}, tags )</if>
+            <if test="channelId!=null">and channel_id = #{channelId}</if>
+            <if test="notTagList != null">
+                and
+                <foreach collection="notTagList" index="index" item="item" open="(" separator="and" close=")">
+                    !FIND_IN_SET( #{item}, tags )
+                </foreach>
+            </if>
+        ) fd
+    </select>
+
+
+    <select id="getRecommendList2" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT
+            fd.resources_id as resourcesId,
+            fd.title,
+            fd.view_count as viewCount,
+            fd.thumb_address as thumbAddress,
+            fd.is_preferred as isPreferred,
+            (SELECT is_collected FROM rs_user_resources WHERE rs_user_id = #{rsUserId} and resources_id = fd.resources_id ) as isCollected,
+            fd.tags as tagsName,
+            (select channel_name from rs_channel where channel_id = fd.channel_id) as channelName
+        FROM
+        (select
+            resources_id,
+            title,
+            view_count,
+            thumb_address,
+            is_preferred,
+            tags,
+            channel_id,
+            enabled,
+        update_date
+        from
+            rs_file_details
+            where
+                enabled = 0 and title is not null and LENGTH(title) !=0
+            <if test="channelId!=null">and channel_id = #{channelId}</if>
+            <if test="tagId != null">and FIND_IN_SET( #{tagId}, tags )</if>
+            <if test="notTagList != null">
+                and
+                <foreach collection="notTagList" index="index" item="item" open="(" separator="and" close=")">
+                    !FIND_IN_SET( #{item}, tags )
+                </foreach>
+            </if>
+            <if test="tagList != null">
+                AND
+                <foreach collection="tagList" index="index" item="item" open="(" separator="or" close=")">
+                    FIND_IN_SET( #{item}, tags )
+                </foreach>
+            </if>
+        ) fd
+        order by
+            fd.update_date desc
+            <if test="offset != null and limit != null">
+                limit #{offset}, #{limit}
+            </if>
+    </select>
+
+    <select id="getRecommendTotal2" parameterType="java.util.Map" resultType="java.lang.Integer">
+        SELECT
+            count(fd.resources_id)
+        FROM
+        (select
+            *
+        from
+            rs_file_details
+            where
+            enabled = 0 and title is not null and LENGTH(title) !=0
+            <if test="channelId!=null">and channel_id = #{channelId}</if>
+            <if test="notTagList != null">
+                and
+                <foreach collection="notTagList" index="index" item="item" open="(" separator="and" close=")">
+                    !FIND_IN_SET( #{item}, tags )
+                </foreach>
+            </if>
+            <if test="tagId != null">and FIND_IN_SET( #{tagId}, tags )</if>
+            <if test="tagList != null">
+                AND
+                <foreach collection="tagList" index="index" item="item" open="(" separator="or" close=")">
+                    FIND_IN_SET( #{item}, tags )
+                </foreach>
+            </if>
+        ) fd
+
+    </select>
+
+  <select id="getRelResources" parameterType="java.util.Map" resultType="java.util.Map">
+    SELECT
+        resources_id AS resourcesId,
+        title,
+        thumb_address AS thumbAddress,
+        view_count as viewCount,
+        is_preferred as isPreferred,
+        tags as tagsName,
+        (select dict_name from rs_dict where `type` ='resources_type' and `value`=resources_type) as resourcesType
+    FROM
+        rs_file_details
+    WHERE
+        enabled = 0
+      <if test="resourcesId != null">
+          and resources_id!=#{resourcesId}
+      </if>
+        <if test="channelId != null">
+            AND channel_id = #{channelId}
+        </if>
+        <if test="author != null" >and author = #{author}</if>
+        <if test="tagList != null">
+          AND
+          <foreach collection="tagList" index="index" item="item" open="(" separator="or" close=")">
+              FIND_IN_SET( #{item}, tags )
+          </foreach>
+        </if>
+    order by
+        create_date desc
+        <if test="offset !=null and limit != null">
+            limit #{offset},#{limit}
+        </if>
+
+  </select>
+
+  <select id="getMayLikeResources" parameterType="java.util.Map" resultType="java.util.Map">
+    SELECT
+        a.resources_id AS resourcesId,
+        a.title,
+        a.thumb_address AS thumbAddress,
+        a.is_preferred as isPreferred,
+        b.channel_name  as channelName,
+        (select dict_name from rs_dict where `type` ='resources_type' and `value`=a.resources_type) as resourcesType
+    FROM
+        rs_file_details a,
+        rs_channel b
+    WHERE
+      a.enabled = 0 and a.channel_id = b.channel_id
+      <if test="resourcesId != null">
+          and a.resources_id!=#{resourcesId}
+      </if>
+    <if test="subList != null">
+      AND
+      <foreach collection="subList" index="index" item="item" open="(" separator="or" close=")">
+        FIND_IN_SET( #{item}, tags )
+      </foreach>
+    </if>
+    <if test="mostViewTagList != null">
+      AND
+      <foreach collection="mostViewTagList" index="index" item="item" open="(" separator="or" close=")">
+        FIND_IN_SET( #{item}, tags )
+      </foreach>
+    </if>
+    order by
+        a.create_date desc
+        <if test="limit != null and offset != null">
+            limit #{offset},#{limit}
+        </if>
+
+  </select>
+
+  <select id="search" parameterType="java.util.Map" resultType="java.util.Map">
+      SELECT
+          f.resources_id AS resourcesId,
+          f.title,
+          f.tags as tagsName,
+          f.thumb_address AS thumbAddress,
+          f.is_preferred as isPreferred,
+          f.view_count as viewCount,
+          c.channel_name  as channelName,
+          (select is_collected from rs_user_resources where  resources_id = f.resources_id and rs_user_id = #{rsUserId}) as isCollected
+      FROM
+          rs_file_details f,
+          rs_channel c
+      WHERE
+        f.enabled = 0 and f.channel_id = c.channel_id
+        <if test="channelId!=null">and f.channel_id =#{channelId}</if>
+        <if test="tagList != null">
+          and
+          <foreach collection="tagList" item="item" index="index" separator="or">
+             FIND_IN_SET(#{item},f.tags)
+          </foreach>
+        </if>
+        <if test="keywordsList !=null">
+            and
+            <foreach collection="keywordsList" item="item" index="index" open="(" separator="and" close=")">
+                title LIKE CONCAT( "%", #{item}, "%" )
+            </foreach>
+        </if>
+        group by f.resources_id
+        order by f.view_count desc
+        <if test="limit != null and offset!=null">
+            limit #{offset}, #{limit}
+        </if>
+
+  </select>
+<!--    <if test="keywords!=null">-->
+<!--        AND concat(",",search_filed,",") LIKE CONCAT( "%", #{keywords}, "%" )-->
+<!--    </if>-->
+
+  <select id="resourcesList" parameterType="java.util.Map" resultType="java.util.Map">
+      SELECT
+          rf.resources_id AS resourcesId,
+          title,
+          tags as tagsName,
+          thumb_address AS thumbAddress,
+          is_preferred as isPreferred,
+          (select is_collected from rs_user_resources where  resources_id = rf.resources_id and rs_user_id = #{rsUserId}) as isCollected,
+          (select dict_name from rs_dict where `type` ='resources_type' and `value`=resources_type) as resourcesType,
+          rc.channel_name as channelName
+      FROM
+          rs_file_details rf
+          left join rs_channel rc on rf.channel_id = rc.channel_id
+      WHERE
+          rf.enabled = 0
+          <if test="channelId != null">
+              and rf.channel_id = #{channelId}
+          </if>
+          <if test="channelId == null">
+              and rf.channel_id in (3,4,5,6,7,16,17)
+          </if>
+          <if test="resourcesType != null  ">
+            and resources_type = #{resourcesType}
+          </if>
+          <if test="keywords != null ">
+              and rf.title like concat("%",#{keywords},"%")
+          </if>
+          <if test="isPreferred != null ">
+            and is_preferred = #{isPreferred}
+          </if>
+          <if test="tagId != null">
+              and FIND_IN_SET( #{tagId}, tags )
+          </if>
+          <if test="tagList != null">
+            AND
+            <foreach collection="tagList" index="index" item="item" open="(" separator="and" close=")">
+              FIND_IN_SET( #{item}, tags )
+            </foreach>
+          </if>
+          <if test="bookTagList != null">
+              AND
+              <foreach collection="bookTagList" index="index" item="item" open="(" separator="or" close=")">
+                  FIND_IN_SET( #{item}, tags )
+              </foreach>
+          </if>
+          <if test="orderList != null">
+            order by
+            <foreach collection="orderList" index="index" item="item" separator=",">
+               rf.${item.sidx} ${item.order}
+            </foreach>
+          </if>
+          <if test="limit !=null and offset !=null">
+              limit #{offset}, #{limit}
+          </if>
+
+
+  </select>
+
+    <select id="getK12Resource" resultType="java.util.Map">
+        SELECT
+            imageurl,
+            file_type as fileType,
+            kcname,
+            `length`,
+            grade,
+            small,
+            subject,
+            unit,
+            version,
+            falsh_url as falshUrl,
+            grade_id as gradeId,
+            small_id as smallId,
+            subject_id as subjectId,
+            unit_id as unitId,
+            version_id as versionId,
+            learning_section_id as learningSectionId,
+            teacher
+        FROM
+            k12_resources
+    </select>
+
+    <insert id="saveMap"  parameterType="java.util.Map" >
+        insert into rs_file_details
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="title != null">
+                title,
+            </if>
+            <if test="introduction != null">
+                introduction,
+            </if>
+            <if test="size != null">
+                `size`,
+            </if>
+            <if test="author != null">
+                `author`,
+            </if>
+            <if test="uploadTime != null">
+                upload_time,
+            </if>
+            <if test="uploadBy != null">
+                upload_by,
+            </if>
+            <if test="viewCount != null">
+                view_count,
+            </if>
+            <if test="downloadCount != null">
+                download_count,
+            </if>
+            <if test="isPreferred != null">
+                is_preferred,
+            </if>
+            <if test="comeFrom != null">
+                come_from,
+            </if>
+            <if test="searchFiled != null">
+                search_filed,
+            </if>
+            <if test="resourcesAddress != null">
+                resources_address,
+            </if>
+            <if test="thumbAddress != null">
+                thumb_address,
+            </if>
+            <if test="headerImageAddress != null">
+                header_image_address,
+            </if>
+            <if test="tags != null">
+                tags,
+            </if>
+            <if test="collectionCount != null">
+                collection_count,
+            </if>
+            <if test="resourcesType != null">
+                resources_type,
+            </if>
+            <if test="subscribeCount != null">
+                subscribe_count,
+            </if>
+            <if test="shareCount != null">
+                share_count,
+            </if>
+            <if test="enabled != null">
+                enabled,
+            </if>
+
+                create_date,
+
+            <if test="createBy != null">
+                create_by,
+            </if>
+            <if test="updateDate != null">
+                update_date,
+            </if>
+            <if test="updateBy != null">
+                update_by,
+            </if>
+            <if test="updateBy != null">
+                update_by,
+            </if>
+            <if test="channelId != null">
+                channel_id,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="title != null">
+                #{title,jdbcType=VARCHAR},
+            </if>
+            <if test="introduction != null">
+                #{introduction,jdbcType=VARCHAR},
+            </if>
+            <if test="size != null">
+                #{size,jdbcType=BIGINT},
+            </if>
+            <if test="author != null">
+                #{author,jdbcType=VARCHAR},
+            </if>
+            <if test="uploadTime != null">
+                #{uploadTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="uploadBy != null">
+                #{uploadBy,jdbcType=BIGINT},
+            </if>
+            <if test="viewCount != null">
+                #{viewCount,jdbcType=INTEGER},
+            </if>
+            <if test="downloadCount != null">
+                #{downloadCount,jdbcType=INTEGER},
+            </if>
+            <if test="isPreferred != null">
+                #{isPreferred,jdbcType=TINYINT},
+            </if>
+            <if test="comeFrom != null">
+                #{comeFrom,jdbcType=INTEGER},
+            </if>
+            <if test="searchFiled != null">
+                #{searchFiled,jdbcType=VARCHAR},
+            </if>
+            <if test="resourcesAddress != null">
+                #{resourcesAddress,jdbcType=VARCHAR},
+            </if>
+            <if test="thumbAddress != null">
+                #{thumbAddress,jdbcType=VARCHAR},
+            </if>
+            <if test="headerImageAddress != null">
+                #{headerImageAddress,jdbcType=VARCHAR},
+            </if>
+            <if test="tags != null">
+                #{tags,jdbcType=VARCHAR},
+            </if>
+            <if test="collectionCount != null">
+                #{collectionCount,jdbcType=INTEGER},
+            </if>
+            <if test="resourcesType != null">
+                #{resourcesType,jdbcType=INTEGER},
+            </if>
+            <if test="subscribeCount != null">
+                #{subscribeCount,jdbcType=INTEGER},
+            </if>
+            <if test="shareCount != null">
+                #{shareCount,jdbcType=INTEGER},
+            </if>
+            <if test="enabled != null">
+                #{enabled,jdbcType=TINYINT},
+            </if>
+                current_timestamp ,
+            <if test="createBy != null">
+                #{createBy,jdbcType=BIGINT},
+            </if>
+            <if test="updateDate != null">
+                #{updateDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateBy != null">
+                #{updateBy,jdbcType=BIGINT},
+            </if>
+            <if test="channelId != null">
+                #{channelId},
+            </if>
+        </trim>
+    </insert>
+
+
+
+    <insert id="saveMap1"  parameterType="java.util.Map" >
+        insert into rs_file_details_copy1
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="title != null">
+                title,
+            </if>
+            <if test="introduction != null">
+                introduction,
+            </if>
+            <if test="size != null">
+                `size`,
+            </if>
+            <if test="uploadTime != null">
+                upload_time,
+            </if>
+            <if test="uploadBy != null">
+                upload_by,
+            </if>
+            <if test="viewCount != null">
+                view_count,
+            </if>
+            <if test="downloadCount != null">
+                download_count,
+            </if>
+            <if test="isPreferred != null">
+                is_preferred,
+            </if>
+            <if test="comeFrom != null">
+                come_from,
+            </if>
+            <if test="searchFiled != null">
+                search_filed,
+            </if>
+            <if test="resourcesAddress != null">
+                resources_address,
+            </if>
+            <if test="thumbAddress != null">
+                thumb_address,
+            </if>
+            <if test="headerImageAddress != null">
+                header_image_address,
+            </if>
+            <if test="tags != null">
+                tags,
+            </if>
+            <if test="collectionCount != null">
+                collection_count,
+            </if>
+            <if test="resourcesType != null">
+                resources_type,
+            </if>
+            <if test="subscribeCount != null">
+                subscribe_count,
+            </if>
+            <if test="shareCount != null">
+                share_count,
+            </if>
+            <if test="enabled != null">
+                enabled,
+            </if>
+
+            create_date,
+
+            <if test="createBy != null">
+                create_by,
+            </if>
+            <if test="updateDate != null">
+                update_date,
+            </if>
+            <if test="updateBy != null">
+                update_by,
+            </if>
+            <if test="updateBy != null">
+                update_by,
+            </if>
+            <if test="channelId != null">
+                channel_id,
+            </if>
+            <if test="downLoadadress != null">
+                download_address,
+            </if>
+            <if test="orginId != null">
+                orgin_id,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="title != null">
+                #{title,jdbcType=VARCHAR},
+            </if>
+            <if test="introduction != null">
+                #{introduction,jdbcType=VARCHAR},
+            </if>
+            <if test="size != null">
+                #{size,jdbcType=BIGINT},
+            </if>
+            <if test="uploadTime != null">
+                #{uploadTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="uploadBy != null">
+                #{uploadBy,jdbcType=BIGINT},
+            </if>
+            <if test="viewCount != null">
+                #{viewCount,jdbcType=INTEGER},
+            </if>
+            <if test="downloadCount != null">
+                #{downloadCount,jdbcType=INTEGER},
+            </if>
+            <if test="isPreferred != null">
+                #{isPreferred,jdbcType=TINYINT},
+            </if>
+            <if test="comeFrom != null">
+                #{comeFrom,jdbcType=INTEGER},
+            </if>
+            <if test="searchFiled != null">
+                #{searchFiled,jdbcType=VARCHAR},
+            </if>
+            <if test="resourcesAddress != null">
+                #{resourcesAddress,jdbcType=VARCHAR},
+            </if>
+            <if test="thumbAddress != null">
+                #{thumbAddress,jdbcType=VARCHAR},
+            </if>
+            <if test="headerImageAddress != null">
+                #{headerImageAddress,jdbcType=VARCHAR},
+            </if>
+            <if test="tags != null">
+                #{tags,jdbcType=VARCHAR},
+            </if>
+            <if test="collectionCount != null">
+                #{collectionCount,jdbcType=INTEGER},
+            </if>
+            <if test="resourcesType != null">
+                #{resourcesType,jdbcType=INTEGER},
+            </if>
+            <if test="subscribeCount != null">
+                #{subscribeCount,jdbcType=INTEGER},
+            </if>
+            <if test="shareCount != null">
+                #{shareCount,jdbcType=INTEGER},
+            </if>
+            <if test="enabled != null">
+                #{enabled,jdbcType=TINYINT},
+            </if>
+            current_timestamp ,
+            <if test="createBy != null">
+                #{createBy,jdbcType=BIGINT},
+            </if>
+            <if test="updateDate != null">
+                #{updateDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateBy != null">
+                #{updateBy,jdbcType=BIGINT},
+            </if>
+            <if test="channelId != null">
+                #{channelId},
+            </if>
+            <if test="downLoadadress != null">
+                #{downLoadadress},
+            </if>
+            <if test="orginId != null">
+                #{orginId},
+            </if>
+        </trim>
+    </insert>
+    <select id="getByOrginId" parameterType="java.lang.String" resultType="java.util.Map">
+        select tags from rs_file_details_copy1 where orgin_id = #{orginId}
+    </select>
+
+    <update id="updateTags" parameterType="java.util.Map" >
+        update rs_file_details_copy1 set tags = #{tags} where orgin_id = #{orginId}
+    </update>
+
+    <select id="getTags" parameterType="java.util.Map" resultType="java.lang.String">
+        SELECT
+            fd.tags
+        FROM
+            rs_user_resources ur,
+            rs_file_details fd
+        WHERE
+            ur.rs_user_id = #{rsUserId}
+            AND ur.resources_id = fd.resources_id
+            <if test="isInterested != null">AND is_interested = 1 </if>
+            <if test="isCollected != null">AND is_collected = 1 </if>
+            <if test="recentlyCeen != null">AND recently_ceen = 1 </if>
+        GROUP BY
+            fd.tags
+    </select>
+
+    <update id="updateFileTags" parameterType="java.util.Map" >
+        update rs_file_details set tags = #{newTags},update_by=100000 where tags = #{oldTags} and channel_id != 18
+    </update>
+
+</mapper>

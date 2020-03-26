@@ -1,0 +1,51 @@
+spring:
+    datasource:
+        type: com.zaxxer.hikari.HikariDataSource
+        driver-class-name: com.mysql.jdbc.Driver
+        hikari:
+            first:  #数据源1
+                url: jdbc:mysql://10.0.1.9:3306/iConductor_resources?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8
+                username: root
+                password: Nugget@20180927
+            second:  #数据源2
+                url: jdbc:mysql://10.0.1.9:3306/ischool?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8
+                username: root
+                password: Nugget@20180927
+            third:  #数据源3
+                url: jdbc:mysql://10.0.1.9:3306/ischool?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8
+                username: root
+                password: Nugget@20180927
+            maximum-pool-size: 15
+            minimum-idle: 5
+            auto-commit: true
+            idle-timeout: 30000
+            pool-name: HikariCP
+            max-lifetime: 1800000
+            connection-timeout: 30000
+            connection-test-query: SELECT 1
+            stat-view-servlet:
+                enabled: true
+                url-pattern: /druid/*
+                #login-username: admin
+                #login-password: admin
+
+            filter:
+                stat:
+                    log-slow-sql: true
+                    slow-sql-millis: 1000
+                    merge-sql: false
+                wall:
+                    config:
+                        multi-statement-allow: true
+
+    redis:
+        open: true  # 是否开启redis缓存  true开启   false关闭
+        database: 0
+        host: 192.168.1.206
+        port: 6379
+        password: diama_2019
+        timeout: 6000ms  # 连接超时时长（毫秒）
+
+fastdfs:
+    fastdfsConf: fdfs_client_205.conf
+    groupName: group1

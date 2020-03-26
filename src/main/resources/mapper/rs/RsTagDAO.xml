@@ -1,0 +1,371 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nugget.modules.rs.dao.RsTagDAO">
+    <resultMap id="BaseResultMap" type="com.nugget.modules.rs.entity.RsTagEntity">
+        <id column="tag_id" jdbcType="INTEGER" property="tagId" />
+        <result column="tag_name" jdbcType="VARCHAR" property="tagName" />
+        <result column="sub_name" jdbcType="VARCHAR" property="subName" />
+        <result column="tag_type" jdbcType="INTEGER" property="tagType" />
+        <result column="used_for" jdbcType="INTEGER" property="usedFor" />
+        <result column="order_by" jdbcType="INTEGER" property="orderBy" />
+        <result column="level" jdbcType="INTEGER" property="level" />
+        <result column="level_str" jdbcType="VARCHAR" property="levelStr" />
+        <result column="parent_ids" jdbcType="VARCHAR" property="parentIds" />
+        <result column="use_count" jdbcType="INTEGER" property="useCount" />
+        <result column="enabled" jdbcType="TINYINT" property="enabled" />
+        <result column="is_show_name" jdbcType="INTEGER" property="isShowName" />
+        <result column="is_show_parent" jdbcType="INTEGER" property="isShowParent" />
+        <result column="create_by" jdbcType="BIGINT" property="createBy" />
+        <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
+        <result column="update_by" jdbcType="BIGINT" property="updateBy" />
+        <result column="update_date" jdbcType="TIMESTAMP" property="updateDate" />
+    </resultMap>
+    <sql id="Base_Column_List">
+    tag_id, tag_name, sub_name, tag_type, used_for, order_by, `level`, level_str, parent_ids, use_count, enabled, is_show_name, is_show_parent,
+    create_by, create_date, update_by, update_date
+  </sql>
+    <sql id="where">
+        <where>
+            <if test="tagId != null">
+                and tag_id = #{tagId}
+            </if>
+            <if test="tagName != null">
+                and tag_name = #{tagName}
+            </if>
+            <if test="usedFor != null">
+                and used_for = #{usedFor}
+            </if>
+            <if test="level != null">
+                and `level` = #{level}
+            </if>
+            <if test="enabled != null">
+                and enabled = #{enabled}
+            </if>
+            <if test="useCount != null">
+                and `use_count` = #{useCount}
+            </if>
+            <if test="parentId != null">
+                and find_in_set(#{parentId}, parent_ids)
+            </if>
+            <if test="tagIds != null">
+                and find_in_set(tag_id, #{tagIds})
+            </if>
+            <if test="tagTypes != null">
+                and find_in_set(tag_type, #{tagTypes})
+            </if>
+            <if test="subscribeList != null">
+                and tag_id in (
+                    <foreach collection="subscribeList" item="item" index="index" separator=",">
+                       #{item}
+                    </foreach>
+                )
+            </if>
+        </where>
+    </sql>
+    <select id="queryList" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/>
+        from rs_tag
+        <include refid="where"/>
+        <if test="offset != null and limit != null">
+            limit #{offset}, #{limit}
+        </if>
+    </select>
+
+    <select id="queryTotal" resultType="int">
+        select count(*) from rs_tag
+        <include refid="where"/>
+    </select>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from rs_tag
+        where tag_id = #{tagId,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from rs_tag
+    where tag_id = #{tagId,jdbcType=INTEGER}
+  </delete>
+    <insert id="insert" keyColumn="tag_id" keyProperty="tagId" parameterType="com.nugget.modules.rs.entity.RsTagEntity" useGeneratedKeys="true">
+    insert into rs_tag (tag_name, tag_type, used_for,
+      order_by, `level`, parent_ids,
+      use_count, enabled, create_by,
+      create_date, update_by, update_date
+      )
+    values (#{tagName,jdbcType=VARCHAR}, #{tagType,jdbcType=INTEGER}, #{usedFor,jdbcType=INTEGER},
+      #{orderBy,jdbcType=INTEGER}, #{level,jdbcType=INTEGER}, #{parentIds,jdbcType=VARCHAR},
+      #{useCount,jdbcType=INTEGER}, #{enabled,jdbcType=TINYINT}, #{createBy,jdbcType=BIGINT},
+      #{createDate,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=BIGINT}, #{updateDate,jdbcType=TIMESTAMP}
+      )
+  </insert>
+    <insert id="saveBatch" parameterType="java.util.List">
+        insert into rs_tag_bak (tag_id, tag_name, tag_type, used_for,
+        order_by, `level`, parent_ids,
+        use_count, enabled, create_by,
+        create_date, update_by, update_date
+        )
+        values
+        <foreach collection="list" item="item" index="index" separator=",">(
+            #{item.tagId,jdbcType=INTEGER},#{item.tagName,jdbcType=VARCHAR}, #{item.tagType,jdbcType=INTEGER}, #{item.usedFor,jdbcType=INTEGER},
+            #{item.orderBy,jdbcType=INTEGER}, #{item.level,jdbcType=INTEGER}, #{item.parentIds,jdbcType=VARCHAR},
+            #{item.useCount,jdbcType=INTEGER}, #{item.enabled,jdbcType=TINYINT}, #{item.createBy,jdbcType=BIGINT},
+            #{item.createDate,jdbcType=TIMESTAMP}, #{item.updateBy,jdbcType=BIGINT}, #{item.updateDate,jdbcType=TIMESTAMP}
+            )
+        </foreach>
+    </insert>
+    <insert id="insertSelective" keyColumn="tag_id" keyProperty="tagId" parameterType="com.nugget.modules.rs.entity.RsTagEntity" useGeneratedKeys="true">
+        insert into rs_tag
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="tagName != null">
+                tag_name,
+            </if>
+            <if test="tagType != null">
+                tag_type,
+            </if>
+            <if test="usedFor != null">
+                used_for,
+            </if>
+            <if test="orderBy != null">
+                order_by,
+            </if>
+            <if test="level != null">
+                `level`,
+            </if>
+            <if test="parentIds != null">
+                parent_ids,
+            </if>
+            <if test="useCount != null">
+                use_count,
+            </if>
+            <if test="enabled != null">
+                enabled,
+            </if>
+            <if test="createBy != null">
+                create_by,
+            </if>
+            <if test="createDate != null">
+                create_date,
+            </if>
+            <if test="updateBy != null">
+                update_by,
+            </if>
+            <if test="updateDate != null">
+                update_date,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="tagName != null">
+                #{tagName,jdbcType=VARCHAR},
+            </if>
+            <if test="tagType != null">
+                #{tagType,jdbcType=INTEGER},
+            </if>
+            <if test="usedFor != null">
+                #{usedFor,jdbcType=INTEGER},
+            </if>
+            <if test="orderBy != null">
+                #{orderBy,jdbcType=INTEGER},
+            </if>
+            <if test="level != null">
+                #{level,jdbcType=INTEGER},
+            </if>
+            <if test="parentIds != null">
+                #{parentIds,jdbcType=VARCHAR},
+            </if>
+            <if test="useCount != null">
+                #{useCount,jdbcType=INTEGER},
+            </if>
+            <if test="enabled != null">
+                #{enabled,jdbcType=TINYINT},
+            </if>
+            <if test="createBy != null">
+                #{createBy,jdbcType=BIGINT},
+            </if>
+            <if test="createDate != null">
+                #{createDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateBy != null">
+                #{updateBy,jdbcType=BIGINT},
+            </if>
+            <if test="updateDate != null">
+                #{updateDate,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+    <update id="update" parameterType="com.nugget.modules.rs.entity.RsTagEntity">
+        update rs_tag
+        <set>
+            <if test="tagName != null">
+                tag_name = #{tagName,jdbcType=VARCHAR},
+            </if>
+            <if test="tagType != null">
+                tag_type = #{tagType,jdbcType=INTEGER},
+            </if>
+            <if test="usedFor != null">
+                used_for = #{usedFor,jdbcType=INTEGER},
+            </if>
+            <if test="orderBy != null">
+                order_by = #{orderBy,jdbcType=INTEGER},
+            </if>
+            <if test="level != null">
+                `level` = #{level,jdbcType=INTEGER},
+            </if>
+            <if test="parentIds != null">
+                parent_ids = #{parentIds,jdbcType=VARCHAR},
+            </if>
+            <if test="useCount != null">
+                use_count = #{useCount,jdbcType=INTEGER},
+            </if>
+            <if test="enabled != null">
+                enabled = #{enabled,jdbcType=TINYINT},
+            </if>
+            <if test="createBy != null">
+                create_by = #{createBy,jdbcType=BIGINT},
+            </if>
+            <if test="createDate != null">
+                create_date = #{createDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateBy != null">
+                update_by = #{updateBy,jdbcType=BIGINT},
+            </if>
+            <if test="updateDate != null">
+                update_date = #{updateDate,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where tag_id = #{tagId,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.nugget.modules.rs.entity.RsTagEntity">
+    update rs_tag
+    set tag_name = #{tagName,jdbcType=VARCHAR},
+      tag_type = #{tagType,jdbcType=INTEGER},
+      used_for = #{usedFor,jdbcType=INTEGER},
+      order_by = #{orderBy,jdbcType=INTEGER},
+      `level` = #{level,jdbcType=INTEGER},
+      parent_ids = #{parentIds,jdbcType=VARCHAR},
+      use_count = #{useCount,jdbcType=INTEGER},
+      enabled = #{enabled,jdbcType=TINYINT},
+      create_by = #{createBy,jdbcType=BIGINT},
+      create_date = #{createDate,jdbcType=TIMESTAMP},
+      update_by = #{updateBy,jdbcType=BIGINT},
+      update_date = #{updateDate,jdbcType=TIMESTAMP}
+    where tag_id = #{tagId,jdbcType=INTEGER}
+  </update>
+
+    <select id="queryByParams" resultType="com.nugget.modules.rs.dto.RespRsTagDto">
+        select *,(select dict_name from rs_dict rd where rd.type='rs_tag_type' and rd.value=tag_type ) as tagTypeName
+        from rs_tag
+        <include refid="where"/>
+        order by order_by desc
+    </select>
+
+    <select id="queryMySubscribe" resultType="com.nugget.modules.rs.entity.RsTagEntity">
+        select rt.* from rs_user_tag_relation rutr
+        left join rs_tag rt on rt.tag_id = rutr.rs_tag_id
+        where rutr.enabled = 0 and rt.enabled = 0
+        <if test="rsUserId != null">
+            and rutr.rs_user_id = #{rsUserId}
+        </if>
+        order by rutr.relation_id desc
+    </select>
+
+    <select id="getByParentId" parameterType="java.lang.Integer" resultType="java.util.Map">
+        select
+            tag_id as tagId,
+            tag_name as tagName,
+            sub_name as subName
+        from
+            rs_tag
+        where
+            parent_ids = #{parentId}
+            order by order_by desc
+    </select>
+    <select id="getByTagName" resultType="java.util.Map">
+      select
+            tag_id as tagId,
+            level_str as levelStr
+
+      from
+            rs_tag
+      where
+            tag_name = #{tagName}
+  </select>
+
+    <select id="queryObject" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+           *
+      from
+            rs_tag
+      where
+            tag_id = #{id}
+  </select>
+
+    <select id="getTagsName" resultType="java.lang.String">
+        select group_concat(tag_name) from rs_tag
+        where enabled =0 and is_show_name = 1
+        <if test="tagIds != null">
+            and find_in_set(tag_id, #{tagIds})
+        </if>
+    </select>
+
+    <select id="getByType" parameterType="java.lang.Integer" resultType="java.util.Map">
+        SELECT
+            tag_id AS tagId,
+            level_str AS levelStr
+        FROM
+            rs_tag
+        WHERE
+            tag_type = #{tagType}
+            <if test="tagName != null">and tag_name = #{tagName} </if>
+    </select>
+
+    <select id="getByLevel" parameterType="java.lang.Integer" resultType="java.util.Map">
+        SELECT
+            tag_id AS tagId,
+            level_str AS levelStr
+        FROM
+            rs_lib_tag
+        WHERE
+            `level` = #{level}
+    </select>
+
+    <select id="getByPid" parameterType="java.lang.Integer" resultType="java.util.Map">
+        select
+            tag_id as tagId,
+            tag_name as tagName,
+             level_str AS levelStr
+        from
+            rs_lib_tag
+        where
+            parent_ids = #{parentId}
+    </select>
+
+    <select id="queryBookTagByParams" resultType="com.nugget.modules.rs.dto.RespBookRsTagDto">
+        select *,group_concat(tag_id) as tagIds,
+        (select dict_name from rs_dict rd where rd.type='rs_tag_type' and rd.value=tag_type ) as tagTypeName
+        from rs_tag
+        <where>
+            <if test="enabled != null">
+                and enabled = #{enabled}
+            </if>
+            <if test="channelId != null">
+                and channel_id = #{channelId}
+            </if>
+            <if test="level != null">
+                and `level` = #{level}
+            </if>
+            <if test="useCount != null">
+                and `use_count` = #{useCount}
+            </if>
+            <if test="bookTagIds != null">
+                and
+                (<foreach collection="bookTagIds" item="item" index="index" separator="or">
+                find_in_set(#{item}, level_str)
+            </foreach>)
+            </if>
+            <if test="tagTypes != null">
+                and find_in_set(tag_type, #{tagTypes})
+            </if>
+        </where>
+        group by tag_name
+        order by order_by desc
+    </select>
+</mapper>

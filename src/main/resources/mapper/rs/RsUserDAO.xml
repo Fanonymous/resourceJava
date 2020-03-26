@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nugget.modules.rs.dao.RsUserDAO">
+  <resultMap id="BaseResultMap" type="com.nugget.modules.rs.entity.RsUserEntity">
+    <result column="rs_user_id" jdbcType="BIGINT" property="rsUserId" />
+    <result column="user_id" jdbcType="BIGINT" property="userId" />
+    <result column="username" jdbcType="VARCHAR" property="username" />
+    <result column="password" jdbcType="VARCHAR" property="password" />
+    <result column="full_name" jdbcType="VARCHAR" property="fullName" />
+    <result column="image_url" jdbcType="VARCHAR" property="imageUrl" />
+    <result column="user_type" jdbcType="INTEGER" property="userType" />
+    <result column="come_from" jdbcType="INTEGER" property="comeFrom" />
+    <result column="tags" jdbcType="VARCHAR" property="tags" />
+    <result column="enabled" jdbcType="TINYINT" property="enabled" />
+    <result column="create_by" jdbcType="BIGINT" property="createBy" />
+    <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="update_by" jdbcType="BIGINT" property="updateBy" />
+    <result column="update_date" jdbcType="TIMESTAMP" property="updateDate" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    rs_user_id, user_id, username, password, full_name, image_url, user_type, come_from, tags, enabled, create_by, create_date, update_by, update_date
+  </sql>
+  <sql id="where">
+    <where>
+      <if test="rsUserId != null">
+        and rs_user_id = #{rsUserId}
+      </if>
+      <if test="userId != null">
+        and user_id = #{userId}
+      </if>
+      <if test="comeFrom != null">
+        and come_from = #{comeFrom}
+      </if>
+    </where>
+  </sql>
+  <select id="queryList" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List"/>
+    from rs_user
+    <include refid="where"/>
+    <if test="offset != null and limit != null">
+      limit #{offset}, #{limit}
+    </if>
+  </select>
+
+  <select id="queryTotal" resultType="int">
+    select count(*) from rs_user
+    <include refid="where"/>
+  </select>
+  <insert id="insert" keyColumn="rs_user_id" keyProperty="rsUserId" parameterType="com.nugget.modules.rs.entity.RsUserEntity" useGeneratedKeys="true">
+    insert into rs_user (rs_user_id, user_id, username, password, full_name, image_url, user_type, come_from, tags,
+      enabled, create_by, create_date, 
+      update_by, update_date)
+    values (#{rsUserId,jdbcType=BIGINT}, #{userId,jdbcType=BIGINT}, #{username,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR},#{fullName,jdbcType=VARCHAR}, #{imageUrl,jdbcType=VARCHAR}, #{userType,jdbcType=INTEGER}, #{comeFrom,jdbcType=INTEGER}, #{tags,jdbcType=VARCHAR},
+      #{enabled,jdbcType=TINYINT}, #{createBy,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP}, 
+      #{updateBy,jdbcType=BIGINT}, #{updateDate,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" keyColumn="rs_user_id" keyProperty="rsUserId" parameterType="com.nugget.modules.rs.entity.RsUserEntity" useGeneratedKeys="true">
+    insert into rs_user
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="userId != null">
+        user_id,
+      </if>
+      <if test="comeFrom != null">
+        come_from,
+      </if>
+      <if test="tags != null">
+        tags,
+      </if>
+      <if test="enabled != null">
+        enabled,
+      </if>
+      <if test="createBy != null">
+        create_by,
+      </if>
+      <if test="createDate != null">
+        create_date,
+      </if>
+      <if test="updateBy != null">
+        update_by,
+      </if>
+      <if test="updateDate != null">
+        update_date,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="userId != null">
+        #{userId,jdbcType=BIGINT},
+      </if>
+      <if test="comeFrom != null">
+        #{comeFrom,jdbcType=INTEGER},
+      </if>
+      <if test="tags != null">
+        #{tags,jdbcType=VARCHAR},
+      </if>
+      <if test="enabled != null">
+        #{enabled,jdbcType=TINYINT},
+      </if>
+      <if test="createBy != null">
+        #{createBy,jdbcType=BIGINT},
+      </if>
+      <if test="createDate != null">
+        #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateBy != null">
+        #{updateBy,jdbcType=BIGINT},
+      </if>
+      <if test="updateDate != null">
+        #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+
+  <update id="update" parameterType="com.nugget.modules.rs.entity.RsUserEntity">
+    update rs_user
+    set user_id = #{userId,jdbcType=BIGINT},
+    username= #{username,jdbcType=VARCHAR},
+    password = #{password,jdbcType=VARCHAR},
+    full_name = #{fullName,jdbcType=VARCHAR},
+    image_url = #{imageUrl,jdbcType=VARCHAR},
+    user_type = #{userType,jdbcType=INTEGER},
+    come_from = #{comeFrom,jdbcType=INTEGER},
+    tags = #{tags,jdbcType=VARCHAR},
+    enabled = #{enabled,jdbcType=TINYINT},
+    create_by = #{createBy,jdbcType=BIGINT},
+    create_date = #{createDate,jdbcType=TIMESTAMP},
+    update_by = #{updateBy,jdbcType=BIGINT},
+    update_date = #{updateDate,jdbcType=TIMESTAMP}
+    where rs_user_id = #{rsUserId,jdbcType=BIGINT}
+  </update>
+
+  <select id="queryByParams" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List"/>
+    from rs_user
+    <include refid="where"/>
+    limit 1
+  </select>
+</mapper>

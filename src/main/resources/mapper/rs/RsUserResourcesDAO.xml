@@ -1,0 +1,347 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nugget.modules.rs.dao.RsUserResourcesDAO">
+    <resultMap id="BaseResultMap" type="com.nugget.modules.rs.entity.RsUserResourcesEntity">
+        <id column="relation_id" jdbcType="BIGINT" property="relationId"/>
+        <result column="rs_user_id" jdbcType="BIGINT" property="rsUserId"/>
+        <result column="resources_id" jdbcType="BIGINT" property="resourcesId"/>
+        <result column="is_subscribed" jdbcType="TINYINT" property="isSubscribed"/>
+        <result column="is_collected" jdbcType="TINYINT" property="isCollected"/>
+        <result column="recently_ceen" jdbcType="TINYINT" property="recentlyCeen"/>
+        <result column="is_interested" jdbcType="TINYINT" property="isInterested"/>
+        <result column="view_count" jdbcType="INTEGER" property="viewCount"/>
+        <result column="is_download" jdbcType="TINYINT" property="isDownload"/>
+        <result column="enabled" jdbcType="TINYINT" property="enabled"/>
+        <result column="create_by" jdbcType="BIGINT" property="createBy"/>
+        <result column="create_date" jdbcType="TIMESTAMP" property="createDate"/>
+        <result column="update_by" jdbcType="BIGINT" property="updateBy"/>
+        <result column="update_date" jdbcType="TIMESTAMP" property="updateDate"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    relation_id, rs_user_id, resources_id, is_subscribed, is_collected, recently_ceen,
+    is_interested, view_count, is_download, enabled, create_by, create_date, update_by,
+    update_date
+  </sql>
+    <sql id="where">
+        <where>
+            <if test="relationId != null">
+                and relation_id = #{relationId}
+            </if>
+        </where>
+    </sql>
+    <select id="queryList" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from rs_user_resources
+        <include refid="where"/>
+        <if test="offset != null and limit != null">
+            limit #{offset}, #{limit}
+        </if>
+    </select>
+
+    <select id="queryTotal" resultType="int">
+        select count(*) from rs_user_resources
+        <include refid="where"/>
+    </select>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from rs_user_resources
+        where relation_id = #{relationId,jdbcType=BIGINT}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from rs_user_resources
+    where relation_id = #{relationId,jdbcType=BIGINT}
+  </delete>
+    <insert id="insert" keyColumn="relation_id" keyProperty="relationId"
+            parameterType="com.nugget.modules.rs.entity.RsUserResourcesEntity" useGeneratedKeys="true">
+    insert into rs_user_resources (rs_user_id, resources_id, is_subscribed,
+      is_collected, collected_date, recently_ceen, recently_date, is_interested, interested_date,
+      view_count, is_download, enabled,
+      create_by, create_date, update_by,
+      update_date)
+    values (#{rsUserId,jdbcType=BIGINT}, #{resourcesId,jdbcType=BIGINT}, #{isSubscribed,jdbcType=TINYINT},
+      #{isCollected,jdbcType=TINYINT},#{collectedDate,jdbcType=TIMESTAMP}, #{recentlyCeen,jdbcType=TINYINT}, #{recentlyDate,jdbcType=TIMESTAMP}, #{isInterested,jdbcType=TINYINT},#{interestedDate,jdbcType=TIMESTAMP},
+      #{viewCount,jdbcType=INTEGER}, #{isDownload,jdbcType=TINYINT}, #{enabled,jdbcType=TINYINT},
+      #{createBy,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=BIGINT},
+      #{updateDate,jdbcType=TIMESTAMP})
+  </insert>
+    <insert id="insertSelective" keyColumn="relation_id" keyProperty="relationId"
+            parameterType="com.nugget.modules.rs.entity.RsUserResourcesEntity" useGeneratedKeys="true">
+        insert into rs_user_resources
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="rsUserId != null">
+                rs_user_id,
+            </if>
+            <if test="resourcesId != null">
+                resources_id,
+            </if>
+            <if test="isSubscribed != null">
+                is_subscribed,
+            </if>
+            <if test="isCollected != null">
+                is_collected,
+            </if>
+            <if test="recentlyCeen != null">
+                recently_ceen,
+            </if>
+            <if test="isInterested != null">
+                is_interested,
+            </if>
+            <if test="viewCount != null">
+                view_count,
+            </if>
+            <if test="isDownload != null">
+                is_download,
+            </if>
+            <if test="enabled != null">
+                enabled,
+            </if>
+            <if test="createBy != null">
+                create_by,
+            </if>
+            <if test="createDate != null">
+                create_date,
+            </if>
+            <if test="updateBy != null">
+                update_by,
+            </if>
+            <if test="updateDate != null">
+                update_date,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="rsUserId != null">
+                #{rsUserId,jdbcType=BIGINT},
+            </if>
+            <if test="resourcesId != null">
+                #{resourcesId,jdbcType=BIGINT},
+            </if>
+            <if test="isSubscribed != null">
+                #{isSubscribed,jdbcType=TINYINT},
+            </if>
+            <if test="isCollected != null">
+                #{isCollected,jdbcType=TINYINT},
+            </if>
+            <if test="recentlyCeen != null">
+                #{recentlyCeen,jdbcType=TINYINT},
+            </if>
+            <if test="isInterested != null">
+                #{isInterested,jdbcType=TINYINT},
+            </if>
+            <if test="viewCount != null">
+                #{viewCount,jdbcType=INTEGER},
+            </if>
+            <if test="isDownload != null">
+                #{isDownload,jdbcType=TINYINT},
+            </if>
+            <if test="enabled != null">
+                #{enabled,jdbcType=TINYINT},
+            </if>
+            <if test="createBy != null">
+                #{createBy,jdbcType=BIGINT},
+            </if>
+            <if test="createDate != null">
+                #{createDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateBy != null">
+                #{updateBy,jdbcType=BIGINT},
+            </if>
+            <if test="updateDate != null">
+                #{updateDate,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+    <update id="update" parameterType="com.nugget.modules.rs.entity.RsUserResourcesEntity">
+        update rs_user_resources
+        <set>
+            <if test="rsUserId != null">
+                rs_user_id = #{rsUserId,jdbcType=BIGINT},
+            </if>
+            <if test="resourcesId != null">
+                resources_id = #{resourcesId,jdbcType=BIGINT},
+            </if>
+            <if test="isSubscribed != null">
+                is_subscribed = #{isSubscribed,jdbcType=TINYINT},
+            </if>
+            <if test="isCollected != null">
+                is_collected = #{isCollected,jdbcType=TINYINT},
+            </if>
+            <if test="collectedDate!= null">
+                collected_date = #{collectedDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="recentlyCeen != null">
+                recently_ceen = #{recentlyCeen,jdbcType=TINYINT},
+            </if>
+            <if test="recentlyDate!= null">
+                recently_date = #{recentlyDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="isInterested != null">
+                is_interested = #{isInterested,jdbcType=TINYINT},
+            </if>
+            <if test="interestedDate!= null">
+                interested_date = #{interestedDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="viewCount != null">
+                view_count = #{viewCount,jdbcType=INTEGER},
+            </if>
+            <if test="isDownload != null">
+                is_download = #{isDownload,jdbcType=TINYINT},
+            </if>
+            <if test="enabled != null">
+                enabled = #{enabled,jdbcType=TINYINT},
+            </if>
+            <if test="createBy != null">
+                create_by = #{createBy,jdbcType=BIGINT},
+            </if>
+            <if test="createDate != null">
+                create_date = #{createDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateBy != null">
+                update_by = #{updateBy,jdbcType=BIGINT},
+            </if>
+            <if test="updateDate != null">
+                update_date = #{updateDate,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where relation_id = #{relationId,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.nugget.modules.rs.entity.RsUserResourcesEntity">
+    update rs_user_resources
+    set rs_user_id = #{rsUserId,jdbcType=BIGINT},
+      resources_id = #{resourcesId,jdbcType=BIGINT},
+      is_subscribed = #{isSubscribed,jdbcType=TINYINT},
+      is_collected = #{isCollected,jdbcType=TINYINT},
+      recently_ceen = #{recentlyCeen,jdbcType=TINYINT},
+      is_interested = #{isInterested,jdbcType=TINYINT},
+      view_count = #{viewCount,jdbcType=INTEGER},
+      is_download = #{isDownload,jdbcType=TINYINT},
+      enabled = #{enabled,jdbcType=TINYINT},
+      create_by = #{createBy,jdbcType=BIGINT},
+      create_date = #{createDate,jdbcType=TIMESTAMP},
+      update_by = #{updateBy,jdbcType=BIGINT},
+      update_date = #{updateDate,jdbcType=TIMESTAMP}
+    where relation_id = #{relationId,jdbcType=BIGINT}
+  </update>
+
+    <select id="queryTotalByMap" resultType="int">
+        select count(*) from rs_user_resources
+        where enabled = 0
+        <if test="rsUserId != null">
+            and rs_user_id = #{rsUserId}
+        </if>
+        <if test="resourcesId != null">
+            and resources_id = #{resourcesId}
+        </if>
+        <if test="isSubscribed != null">
+            and is_subscribed = #{isSubscribed}
+        </if>
+        <if test="isCollected != null">
+            and is_collected = #{isCollected}
+        </if>
+        <if test="isInterested != null">
+            and is_interested = #{isInterested}
+        </if>
+        <if test="recentlyCeen != null">
+            and recently_ceen = #{recentlyCeen}
+        </if>
+
+    </select>
+
+    <select id="queryByMap" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from rs_user_resources
+        where enabled = 0
+        <if test="rsUserId != null">
+            and rs_user_id = #{rsUserId}
+        </if>
+        <if test="resourcesId != null">
+            and resources_id = #{resourcesId}
+        </if>
+        <if test="isSubscribed != null">
+            and is_subscribed = #{isSubscribed}
+        </if>
+        <if test="isCollected != null">
+            and is_collected = #{isCollected}
+        </if>
+        <if test="isInterested != null">
+            and is_interested = #{isInterested}
+        </if>
+        <if test="recentlyCeen != null">
+            and recently_ceen = #{recentlyCeen}
+        </if>
+        limit 1
+    </select>
+
+
+    <select id="getUserResources" resultType="com.nugget.modules.rs.dto.UserResourcesDto">
+        select rfd.*,(select channel_name from rs_channel where channel_id = rfd.channel_id) as channelName,
+        (select tag_name from rs_tag where tag_id = REVERSE(SUBSTRING_INDEX(REVERSE(tags),',',1))) as tagsName,
+        (select order_by from rs_tag where tag_id = REVERSE(SUBSTRING_INDEX(REVERSE(tags),',',1))) as tagsOrderBy
+        from rs_user_resources rur
+        left join rs_file_details rfd on rur.resources_id = rfd.resources_id
+        where rur.enabled = 0 and rfd.enabled = 0
+        <if test="rsUserId != null">
+            and rur.rs_user_id = #{rsUserId}
+        </if>
+        <if test="isCollected != null">
+            and rur.is_collected = #{isCollected}
+        </if>
+        <if test="recentlyCeen != null">
+            and rur.recently_ceen = #{recentlyCeen}
+        </if>
+        <if test="channelId != null">
+            and rfd.channel_id = #{channelId}
+        </if>
+        <if test="notChannelId != null">
+            and rfd.channel_id != #{notChannelId}
+        </if>
+        <if test="orderByStr != null">
+            ${orderByStr}
+        </if>
+        <if test="offset != null and limit != null">
+            limit #{offset}, #{limit}
+        </if>
+    </select>
+
+    <select id="queryUserResourcesTotal" resultType="int">
+        select count(*)
+        from rs_user_resources rur
+        left join rs_file_details rfd on rur.resources_id = rfd.resources_id
+        where rur.enabled = 0 and rfd.enabled = 0
+        <if test="rsUserId != null">
+            and rur.rs_user_id = #{rsUserId}
+        </if>
+        <if test="isCollected != null">
+            and rur.is_collected = #{isCollected}
+        </if>
+        <if test="recentlyCeen != null">
+            and rur.recently_ceen = #{recentlyCeen}
+        </if>
+        <if test="channelId != null">
+            and rfd.channel_id = #{channelId}
+        </if>
+        <if test="notChannelId != null">
+            and rfd.channel_id != #{notChannelId}
+        </if>
+    </select>
+
+    <select id="mostViewTagList" parameterType="java.lang.String" resultType="java.lang.String">
+        SELECT
+            fd.tags
+        FROM
+            rs_file_details fd,
+            rs_user_resources ur
+        WHERE
+            fd.enabled = 0
+            AND ur.rs_user_id = #{rsUserId}
+            AND ur.resources_id = fd.resources_id
+            AND DATE_SUB( CURDATE( ), INTERVAL 7 DAY ) &lt;= date( ur.update_date )
+        group by fd.tags
+        order by
+            fd.view_count desc
+    </select>
+
+
+</mapper>

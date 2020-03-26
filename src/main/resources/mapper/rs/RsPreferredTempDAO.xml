@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nugget.modules.rs.dao.RsPreferredTempDAO">
+  <resultMap id="BaseResultMap" type="com.nugget.modules.rs.entity.RsPreferredTempEntity">
+    <result column="id" jdbcType="BIGINT" property="id" />
+    <result column="resources_id" jdbcType="BIGINT" property="resourcesId" />
+    <result column="preferred_num" jdbcType="FLOAT" property="preferredNum" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, resources_id, preferred_num
+  </sql>
+  <sql id="where">
+    <where>
+      <if test="resourcesId != null">
+        and resources_id = #{resourcesId}
+      </if>
+    </where>
+  </sql>
+  <select id="queryList" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List"/>
+    from rs_preferred_temp
+    <include refid="where"/>
+    order by preferred_num desc
+    <if test="offset != null and limit != null">
+      limit #{offset}, #{limit}
+    </if>
+  </select>
+
+  <select id="queryTotal" resultType="int">
+    select count(*) from rs_preferred_temp
+    <include refid="where"/>
+  </select>
+
+  <insert id="saveBatch" parameterType="java.util.List">
+    insert into rs_preferred_temp (resources_id, preferred_num)
+    values
+    <foreach collection="list" item="item" index="index" separator=",">(
+      #{item.resourcesId,jdbcType=BIGINT}, #{item.preferredNum,jdbcType=FLOAT})
+    </foreach>
+  </insert>
+
+  <update id="deleteAllData">
+    truncate table rs_preferred_temp
+  </update>
+</mapper>

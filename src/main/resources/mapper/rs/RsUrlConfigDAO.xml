@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nugget.modules.rs.dao.RsUrlConfigDAO">
+  <resultMap id="BaseResultMap" type="com.nugget.modules.rs.entity.RsUrlConfigEntity">
+    <result column="id" jdbcType="BIGINT" property="id" />
+    <result column="url" jdbcType="VARCHAR" property="url" />
+    <result column="come_from" jdbcType="TINYINT" property="comeFrom" />
+    <result column="enabled" jdbcType="TINYINT" property="enabled" />
+    <result column="create_by" jdbcType="BIGINT" property="createBy" />
+    <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, url, come_from, enabled, create_by, create_date
+  </sql>
+
+  <select id="queryByComeFrom" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List"/>
+    from rs_url_config
+    where enabled = 0 and come_from = #{comeFrom}
+    limit 1
+  </select>
+</mapper>

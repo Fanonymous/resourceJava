@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nugget.modules.rs.dao.RsApplicationDAO">
+
+
+    <select id="getUserApp" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT
+            app_id as appId,
+            app_name as appName,
+            address,
+            icon
+        FROM
+            rs_application
+        WHERE
+            FIND_IN_SET(#{userType},apply_for)
+            and enabled = 0
+    </select>
+
+    <insert id="insert" keyColumn="app_id" keyProperty="appId" parameterType="com.nugget.modules.rs.entity.RsApplicationEntity" useGeneratedKeys="true">
+        insert into rs_application (app_name, address, icon,
+          order_by, view_count, enabled,
+          create_by, create_date, update_by,
+          update_date)
+        values (#{appName,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR}, #{icon,jdbcType=VARCHAR},
+          #{orderBy,jdbcType=INTEGER}, #{viewCount,jdbcType=INTEGER}, #{enabled,jdbcType=TINYINT},
+          #{createBy,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=BIGINT},
+          #{updateDate,jdbcType=TIMESTAMP})
+    </insert>
+    <insert id="insertSelective" keyColumn="app_id" keyProperty="appId" parameterType="com.nugget.modules.rs.entity.RsApplicationEntity" useGeneratedKeys="true">
+        insert into rs_application
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="appName != null">
+                app_name,
+            </if>
+            <if test="address != null">
+                address,
+            </if>
+            <if test="icon != null">
+                icon,
+            </if>
+            <if test="orderBy != null">
+                order_by,
+            </if>
+            <if test="viewCount != null">
+                view_count,
+            </if>
+            <if test="enabled != null">
+                enabled,
+            </if>
+            <if test="createBy != null">
+                create_by,
+            </if>
+            <if test="createDate != null">
+                create_date,
+            </if>
+            <if test="updateBy != null">
+                update_by,
+            </if>
+            <if test="updateDate != null">
+                update_date,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="appName != null">
+                #{appName,jdbcType=VARCHAR},
+            </if>
+            <if test="address != null">
+                #{address,jdbcType=VARCHAR},
+            </if>
+            <if test="icon != null">
+                #{icon,jdbcType=VARCHAR},
+            </if>
+            <if test="orderBy != null">
+                #{orderBy,jdbcType=INTEGER},
+            </if>
+            <if test="viewCount != null">
+                #{viewCount,jdbcType=INTEGER},
+            </if>
+            <if test="enabled != null">
+                #{enabled,jdbcType=TINYINT},
+            </if>
+            <if test="createBy != null">
+                #{createBy,jdbcType=BIGINT},
+            </if>
+            <if test="createDate != null">
+                #{createDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateBy != null">
+                #{updateBy,jdbcType=BIGINT},
+            </if>
+            <if test="updateDate != null">
+                #{updateDate,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.nugget.modules.rs.entity.RsApplicationEntity">
+        update rs_application
+        <set>
+            <if test="appName != null">
+                app_name = #{appName,jdbcType=VARCHAR},
+            </if>
+            <if test="address != null">
+                address = #{address,jdbcType=VARCHAR},
+            </if>
+            <if test="icon != null">
+                icon = #{icon,jdbcType=VARCHAR},
+            </if>
+            <if test="orderBy != null">
+                order_by = #{orderBy,jdbcType=INTEGER},
+            </if>
+            <if test="viewCount != null">
+                view_count = #{viewCount,jdbcType=INTEGER},
+            </if>
+            <if test="enabled != null">
+                enabled = #{enabled,jdbcType=TINYINT},
+            </if>
+            <if test="createBy != null">
+                create_by = #{createBy,jdbcType=BIGINT},
+            </if>
+            <if test="createDate != null">
+                create_date = #{createDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateBy != null">
+                update_by = #{updateBy,jdbcType=BIGINT},
+            </if>
+            <if test="updateDate != null">
+                update_date = #{updateDate,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where app_id = #{appId,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.nugget.modules.rs.entity.RsApplicationEntity">
+        update rs_application
+        set app_name = #{appName,jdbcType=VARCHAR},
+          address = #{address,jdbcType=VARCHAR},
+          icon = #{icon,jdbcType=VARCHAR},
+          order_by = #{orderBy,jdbcType=INTEGER},
+          view_count = #{viewCount,jdbcType=INTEGER},
+          enabled = #{enabled,jdbcType=TINYINT},
+          create_by = #{createBy,jdbcType=BIGINT},
+          create_date = #{createDate,jdbcType=TIMESTAMP},
+          update_by = #{updateBy,jdbcType=BIGINT},
+          update_date = #{updateDate,jdbcType=TIMESTAMP}
+        where app_id = #{appId,jdbcType=BIGINT}
+    </update>
+</mapper>

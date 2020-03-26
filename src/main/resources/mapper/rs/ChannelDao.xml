@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nugget.modules.rs.dao.ChannelDao">
+
+
+    <select id="getUserChannel" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT
+            rc.channel_id AS channelId,
+            rc.channel_name AS channelName,
+            rc.url,
+            uc.order_by as orderBy,
+            is_open as isOpen
+        FROM
+            rs_channel rc,
+            rs_user_channel uc
+        WHERE
+            rc.enabled = 0
+            AND rc.channel_id = uc.channel_id
+            AND uc.rs_user_id = #{rsUserId}
+            <if test="url != null">and url = #{url}</if>
+            <if test="isOpen == 1">and is_open = 1 and rc.channel_id not in (1,2)</if>
+        ORDER BY
+            uc.order_by
+    </select>
+
+    <select id="hotChannelList" resultType="java.util.Map" parameterType="java.util.Map">
+        SELECT
+            rc.channel_id AS channelId,
+            rc.channel_name AS channelName,
+            rc.url
+        FROM
+            rs_channel rc
+        WHERE
+            rc.enabled = 0
+            AND rc.channel_id NOT IN ( SELECT channel_id FROM rs_user_channel WHERE rs_user_id = #{rsUserId} )
+            AND FIND_IN_SET( #{userType}, apply_for )
+        ORDER BY
+            rc.order_by
+    </select>
+
+    <delete id="del" parameterType="java.lang.String">
+        delete from rs_user_channel where rs_user_id =#{rsUserId}
+    </delete>
+
+    <insert id="saveBatch" parameterType="java.util.Map" >
+        insert into rs_user_channel (rs_user_id,channel_id,order_by) values
+        <foreach collection="list" index="index" item="item"  separator=",">
+            (
+            #{rsUserId},
+            #{item.channelId},
+            #{item.orderBy}
+            )
+        </foreach>
+
+    </insert>
+
+    <insert id="saveListData" parameterType="java.util.Map" >
+        insert into rs_user_channel (rs_user_id,channel_id,order_by) values
+        <foreach collection="list" index="index" item="item"  separator=",">
+            (
+            #{rsUserId},
+            #{item.channelId},
+            #{item.orderBy}
+            )
+        </foreach>
+    </insert>
+
+    <select id="listByKey"  resultType="java.util.Map">
+        select
+            tag_id as tagId,
+            tag_name as tagName,
+            parent_ids as parentId
+        from
+            rs_tag
+        where
+            tag_name like concat("%",#{keywords},"%")
+            and `level`>= #{level}
+        order by order_by
+    </select>
+
+    <select id="getSecondTag" resultType="java.util.Map">
+        select tag_id as channelId, tag_name as channelName
+        from  rs_tag where channel_id = #{channelId} order by  order_by
+    </select>
+
+    <update id="updateOrder" parameterType="java.util.Map">
+        <foreach collection="list" index="index" item="item" separator=";">
+            update rs_user_channel set order_by = #{item.orderBy}
+            where rs_user_id = #{item.rsUserId} and channel_id = #{item.channelId}
+        </foreach>
+
+    </update>
+
+    <select id="getByName" parameterType="java.lang.String" resultType="java.util.Map">
+        select
+            channel_id as channelId,
+            channel_name as channelName,
+            order_by as orderBy,
+            is_open as isOpne
+        from
+            rs_channel
+        where
+            channel_name = #{channelName}
+    </select>
+
+    <select id="queryObject" parameterType="java.lang.Long" resultType="com.nugget.modules.rs.entity.RsChannelEntity">
+        select
+           *
+        from
+            rs_channel
+        where
+            channel_id = #{id}
+  </select>
+
+</mapper>
